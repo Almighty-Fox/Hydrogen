@@ -24,7 +24,7 @@ class ClassOFNodes:
         self.CL = 0
 
     def determination_co(self, Rl, width_l, C1, C2, width_r):
-        """sffeferfeferfe"""
+        """задаем начальную концентрацию"""
         if self.ri < (Rl - width_l):
             self.ci = C1
         elif self.ri < Rl:
@@ -35,11 +35,11 @@ class ClassOFNodes:
             self.ci = 0
 
     def determination_ti(self, TTT):
-        """firesafe"""
+        """определяем температуру в каждом узле"""
         self.ti = TTT
 
     def determination_di(self, do, UUU, kkk):
-        """sffeferfeferfe"""
+        """определяем коэф диффузии в каждом узле"""
         # self.di = do * math.exp((-UUU / (kkk * self.ti)))
         self.di = 1e-9  # m^2/s
 
@@ -48,19 +48,21 @@ class ClassOFNodes:
         self.CL = CLL
 
     def determination_di_lovushki(self, do, UUU, kkk, VL, VT1, K1, DT1):
-        """sffeferfeferfe"""
+        """определяем новый экв коэф диффузии с учетом ловушек"""
         # dl = do * math.exp((-UUU / (kkk * self.ti)))
         dl = 1e-9  # m^2/s
         slag = (VL / VT1 * K1 / (K1 + VL * self.CL * (1 - K1))**2)
         self.di = (dl + DT1 * slag) * (1 + slag)**(-1)
 
     def determination_abcf_zero(self):
+        """обнуляем коэф прогонки"""
         self.kai = 0
         self.kbi = 0
         self.kci = 0
         self.kfi = 0
 
     def determination_abcf(self, node_sled, drr, dt, vol1, vol2, sss):
+        """определяем коэф прогонки"""
         self.kbi = sss * self.di / drr
         self.kci += self.kbi + vol1 / dt
         self.kfi += self.ci * vol1 / dt
@@ -69,6 +71,7 @@ class ClassOFNodes:
         node_sled.kfi += node_sled.ci * vol2 / dt
 
     def determination_abcf_tempr(self, node_sled, drr, dt, vol1, vol2, sss, LLL):
+        """определяем коэф прогонки ур теплопроводности"""
         self.kbi = sss * LLL / drr
         self.kci += self.kbi + vol1 / dt
         self.kfi += self.ti * vol1 / dt
@@ -77,6 +80,7 @@ class ClassOFNodes:
         node_sled.kfi += node_sled.ti * vol2 / dt
 
     def determination_abcf_gu(self, C0):
+        """определяем начальные коэф прогонки из ГУ"""
         self.kai = 0
         self.kbi = 0
         self.kci = 1

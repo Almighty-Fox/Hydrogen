@@ -8,48 +8,10 @@ from scipy.optimize import fsolve
 import numpy
 
 
-def main_body_fun():
+def main_body_fun(D0_list, L_list, U_list, k_list, T0, VL_list, VT1_list, K1_list, DT1_list):
     # plt.style.use('seaborn-pastel')
 
-    # ---------определяем параметры для диффузии и теплопроводности----------
-    # D0 = 800  # mm^2/s
-    D0 = 8e-6  # 8e-6 m^2/s ---------- коэф диффузии
-    LLL = 3.352e-6  # коэф температуропроводности нержавеющей стали
-    UUU = 0.1  # eV ------- энергия связи
-    kkk = 8.62e-5  # eV/K ------ коэф Больцмана
-    To = 20 + 273  # 300  # K --------- начальная температура всего образца
-    vel = 0.00  # скорость прогрева
 
-    # ---------определяем параметры геометрии оброазца----------
-    Rad = 2.2e-3 / 2  # m # mm r = 3e-3
-    h = 0.6  # высота образца
-    MaxNode = 1000 + 1  # количесвто узлов
-    DR = Rad / MaxNode
-    Rl = Rad * 0.99
-    width_l = 0.005 * Rad
-    width_r = 0.005 * Rad
-
-    # ---------определяем параметры времени----------
-    time0 = 10000000  # s
-    Dt = 10  # -------------------------------------------------------------------------------
-    Time_pik_1 = 0
-    Flow_pik_1 = 0
-
-    # ---------определяем параметры концентрации----------
-    C0 = 0  # Моль / м^3 # концентрация вне образца
-    # C1 = 300  # 962.1169  # Моль / м^3 # концентрация внутри образца
-    C1 = 160
-    # C2 = 6000  # 962.1169  # Моль / м^3 # концентрация погран слоя
-    C2 = 6000
-
-    # ---------параметры ловушек-----------
-    VL = 4.9e-6  # 4.9e-6  # m^3/mol
-    VT1 = 6e-5  # 6e-5  # m^3/mol
-    # VT1 = 6e-10  # 6e-5  # m^3/mol
-    K1 = 1.6e-5  # 2.0965e-16  # 1.6e-5  # skal
-    DT1 = 1e-13
-    # DT1 = 0
-    # -----------------------------------
 
     nodes = [ClassOFNodes(i, Rad, MaxNode) for i in range(MaxNode)]  # вводим массив объектов класса узлов
 
@@ -92,9 +54,6 @@ def main_body_fun():
     # -----------------------------------
 
     t = Dt  # первый момент времени равен одному шагу по времени
-
-    Time_pik_1 = 1000  # для прохождения условия в конце проги ускорения построения графика
-    zapis_v_fail = 0  # проверка первого вхождения для записи графика в файл
 
     while t <= time0:
 
@@ -196,30 +155,6 @@ def main_body_fun():
         axs[1].clear()
         axs[2].clear()
 
-        # if t in [5e5, 1e6, 2e6, 5e6, 1e7, 2e7, 5e7, 1e8, 2e8]:  # пишем в файлы концентрацию ОБЩУЮ C и
-        #     # решетки CL для заданных времен
-        #     outputfile = '../C_' + str(t) + '.txt'
-        #     outputfile_2 = '../CL_' + str(t) + '.txt'
-        #     myfile = open(outputfile, mode='w', encoding='latin_1')
-        #     myfile_2 = open(outputfile_2, mode='w', encoding='latin_1')
-        #     for node in nodes:
-        #         myfile.write(str(node.ci) + '\n')
-        #         myfile_2.write(str(node.CL) + '\n')
-        #     myfile.close()
-        #     myfile_2.close()
-
-        # if t in [5e3, 1e4]:  # пишем в файл зависимость потока от времени
-        if (t >= 5e3) and (zapis_v_fail == 0):  # пишем в файл зависимость потока от времени
-            zapis_v_fail = 1
-            # outputfile = '../Flow_' + str(t) + '.txt'
-            outputfile = '../Flow_' + str(5000) + '.txt'
-            myfile = open(outputfile, mode='w', encoding='latin_1')
-            for ii, jj in zip(time_plot, Flow):
-                myfile.write(str(ii) + ' ' + str(jj) + '\n')
-            myfile.close()
-
-        if t > (5 * Time_pik_1):  # ускоряем построение графика
-            Dt = 30
         t += Dt
         # --------------------------------
 
