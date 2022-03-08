@@ -1,5 +1,7 @@
 from concurrent import futures
-from main_body import *
+from main_body_parallel import *
+import numpy as np
+from nodes_class import ClassOFNodes
 
 
 if __name__ == "__main__":
@@ -15,14 +17,14 @@ if __name__ == "__main__":
     # ---------определяем параметры геометрии оброазца----------
     Rad = 2.2e-3 / 2  # m # mm r = 3e-3
     h = 0.6  # высота образца
-    MaxNode = 1000 + 1  # количесвто узлов
+    MaxNode = 10 + 1  # количесвто узлов
     DR = Rad / MaxNode
     Rl = Rad * 0.99
     width_l = 0.005 * Rad
     width_r = 0.005 * Rad
 
     # ---------определяем параметры времени----------
-    time0 = 10000000  # s
+    time0 = 300  # s
     Dt = 10  # -------------------------------------------------------------------------------
     Time_pik_1 = 0
     Flow_pik_1 = 0
@@ -43,13 +45,46 @@ if __name__ == "__main__":
     # DT1 = 0
     # -----------------------------------
 
+    num_kan = 2
+    nodes = [[ClassOFNodes(i, Rad, MaxNode) for i in range(MaxNode)] for jj in range(num_kan)]  # вводим массив объектов класса узлов
+
+    for jj in range(num_kan):
+        for node in nodes[jj]:  # назначаем начальную концентрацию, коэффициент диффузии и Т
+            node.determination_co(Rl, width_l, C1[jj], C2[jj], width_r)
+            node.determination_ti(To)
+            node.determination_di(D0[jj], UUU[jj], kkk)
+
+    # concentration = []  # вводим массив для концентрации, будет обновляться каждый момент времени
+    # concentration = np.zeros((num_kan, MaxNode))
+    concentration = [[] for i in range(num_kan)]
+    coordinate = []  # вводим массив для координат, задаем один раз до цикла по времени
+    # temperature = []  # вводим массив для температуры, будет обновляться каждый момент времени
+    # temperature = np.zeros((num_kan, MaxNode))
+    temperature = [[] for i in range(num_kan)]
+
+    # Flow = []  # вводим массив для потока, будет дополняться каждый момент времени
+    Flow = [[] for i in range(num_kan)]
+    # time_plot = [0]  # вводим массив для времени, будет дополняться каждый момент времени
+    time_plot = [[0] for i in range(num_kan)]
+
+    for jj in range(num_kan):
+        for node in nodes[jj]:  # заоплняем начальные массивы концентрации, температуры и постоянный массив координат
+            concentration[jj].append(node.ci)
+            temperature[jj].append(node.ti)
+
+    for node in nodes[0]:
+        coordinate.append(node.ri)
+
+    # заполняем одним значением поток до процесса диффузии
+    for jj in range(num_kan):
+        flow = -nodes[jj][MaxNode - 1].di * (nodes[jj][MaxNode - 1].ci - nodes[jj][MaxNode - 2].ci) / (nodes[jj][MaxNode - 1].ri - nodes[jj][MaxNode - 2].ri)
+        Flow[jj].append(flow)
+
+
     with futures.ThreadPoolExecutor(max_workers=3) as executor:
 
-        todo = []
+        print("\nЗашел в потоки")
 
-        for i in range(2, 5):
-            future = executor.submit(main_body_fun(), i)
-            todo.append(future)
-
-        for future in futures.as_completed(todo):
-            print(future.result())
+        for jj in range(num_kan):
+            print("\nЦикл по потоку ", jj)
+            future = executor.submit(main_body_fun, D0[jj], LLL[jj], UUU[jj], kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C0[jj], nodes[jj], jj)

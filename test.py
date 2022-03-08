@@ -1,3 +1,8 @@
-a = [i for i in range(10)]
-print(a)
-print(a[1:4])
+import numpy as np
+
+
+x = [[] for i in range(3)]
+print(x)
+x[1].append(1)
+x[1].append(2)
+print(x)
