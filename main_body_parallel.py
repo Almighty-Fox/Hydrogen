@@ -10,7 +10,7 @@ from global_var import *
 
 
 def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C0, nodes_index, index):
-    global concentration, Flow, time_plot
+    global concentration, Flow, time_plot, temperature
     print("\nЗашел в поток ", index)
     # plt.style.use('seaborn-pastel')
 
@@ -35,7 +35,6 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
     t = Dt  # первый момент времени равен одному шагу по времени
 
     while t <= time0:
-        print("1. Time in thread ", index, " = ", t)
 
         # TTT = To + vel * t  # опрелеяем температуру воздуха в данный момент времени
         TTT = 750 + 273
@@ -43,8 +42,6 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
         # --------------решаем уравнение теплопроводности------------
         for node in nodes_index:
             node.determination_abcf_zero()  # обнуляем коэффициенты
-
-        print("2. Time in thread ", index, " = ", t)
 
         for ID, node in enumerate(nodes_index[0:(MaxNode - 1)], start=0):  # находим коэф a,b,c,d для всех узлов
             # РАБОТАЕМ В ЦИЛИНДРИЧЕСКОЙ СК
@@ -73,8 +70,6 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
         # for node in nodes:
         #     node.determination_di(D0, UUU, kkk)  # определяем коэф диффузии в данный момент времени в данном узле
 
-        print("3. Time in thread ", index, " = ", t)
-
         # теперь считаем коэф диффузии с учетом ловушек
         for node in nodes_index:
             CL_ = fsolve(function_for_lovushek, numpy.array([0.2]), args=(VL, VT1, K1, node.ci))
@@ -100,32 +95,23 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
 
         nodes_index[MaxNode - 1].determination_abcf_gu(C0)  # определяем ГУ для коэф a,b,c,d
 
-        print("4. Time in thread ", index, " = ", t)
 
         # ------------------прогонка неявного метода---------------------------------
         nodes_index = neyavnaya_progonka(nodes_index, MaxNode)
         # ------------------конец прогонки---------------------------------
         # -----------конец решения уравнения диффузии-----------------------
-        print("5. Time in thread ", index, " = ", t)
         # нашли концентрацию во всех узлах в следующий момент времени
-        print("6. Time in thread ", index, " = ", t)
         concentration[index] = []
-        print("7. Time in thread ", index, " = ", t)
-        temperature = []
-        print("8. Time in thread ", index, " = ", t)
+        temperature[index] = []
         for node in nodes_index:
             concentration[index].append(node.ci)
-            temperature.append(node.ti)
-
-        print("9. Time in thread ", index, " = ", t)
+            temperature[index].append(node.ti)
 
         flow = -nodes_index[MaxNode - 1].di * (nodes_index[MaxNode - 1].ci - nodes_index[MaxNode - 2].ci) / (
                 nodes_index[MaxNode - 1].ri - nodes_index[MaxNode - 2].ri)
         # print(flow)
         Flow[index].append(flow)
         time_plot[index].append(t)
-
-        print("11. Time in thread ", index, " = ", t)
 
         # if t > Dt:
         #     if (Flow[-2] > Flow[-1]) and (Flow[-2] > Flow[-3]):
