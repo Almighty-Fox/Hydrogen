@@ -2,10 +2,11 @@ from concurrent import futures
 from main_body_parallel import *
 import numpy as np
 from nodes_class import ClassOFNodes
+from global_var import *
 
 
 if __name__ == "__main__":
-
+    global concentration, Flow, time_plot
     # ---------определяем параметры для диффузии и теплопроводности----------
     D0 = [8e-6, 8e-5]  # 8e-6 m^2/s ---------- коэф диффузии
     LLL = [3.352e-6, 2e-6]  # коэф температуропроводности нержавеющей стали
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     width_r = 0.005 * Rad
 
     # ---------определяем параметры времени----------
-    time0 = 300  # s
+    time0 = 3000  # s
     Dt = 10  # -------------------------------------------------------------------------------
     Time_pik_1 = 0
     Flow_pik_1 = 0
@@ -56,16 +57,16 @@ if __name__ == "__main__":
 
     # concentration = []  # вводим массив для концентрации, будет обновляться каждый момент времени
     # concentration = np.zeros((num_kan, MaxNode))
-    concentration = [[] for i in range(num_kan)]
+    # concentration = [[] for i in range(num_kan)]
     coordinate = []  # вводим массив для координат, задаем один раз до цикла по времени
     # temperature = []  # вводим массив для температуры, будет обновляться каждый момент времени
     # temperature = np.zeros((num_kan, MaxNode))
     temperature = [[] for i in range(num_kan)]
 
     # Flow = []  # вводим массив для потока, будет дополняться каждый момент времени
-    Flow = [[] for i in range(num_kan)]
+    # Flow = [[] for i in range(num_kan)]
     # time_plot = [0]  # вводим массив для времени, будет дополняться каждый момент времени
-    time_plot = [[0] for i in range(num_kan)]
+    # time_plot = [[0] for i in range(num_kan)]
 
     for jj in range(num_kan):
         for node in nodes[jj]:  # заоплняем начальные массивы концентрации, температуры и постоянный массив координат
@@ -88,3 +89,9 @@ if __name__ == "__main__":
         for jj in range(num_kan):
             print("\nЦикл по потоку ", jj)
             future = executor.submit(main_body_fun, D0[jj], LLL[jj], UUU[jj], kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C0[jj], nodes[jj], jj)
+
+    sum_concentration = np.zeros(MaxNode)
+    for ii in range(num_kan):
+        sum_concentration += np.array(concentration[ii])
+    plt.plot(coordinate, sum_concentration, 'r', linewidth=1)
+    plt.show()

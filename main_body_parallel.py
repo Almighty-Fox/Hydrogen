@@ -6,6 +6,7 @@ from progonka_tempr import neyavnaya_progonka_tempr
 from eq_for_lovushek import function_for_lovushek
 from scipy.optimize import fsolve
 import numpy
+from global_var import *
 
 
 def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C0, nodes_index, index):
@@ -108,22 +109,21 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
         print("5. Time in thread ", index, " = ", t)
         # нашли концентрацию во всех узлах в следующий момент времени
         print("6. Time in thread ", index, " = ", t)
-        print(concentration)
         concentration[index] = []
         print("7. Time in thread ", index, " = ", t)
         temperature = []
         print("8. Time in thread ", index, " = ", t)
         for node in nodes_index:
-            # concentration[index].append(node.ci)
+            concentration[index].append(node.ci)
             temperature.append(node.ti)
 
         print("9. Time in thread ", index, " = ", t)
 
-        # flow = -nodes_index[MaxNode - 1].di * (nodes_index[MaxNode - 1].ci - nodes_index[MaxNode - 2].ci) / (
-        #         nodes_index[MaxNode - 1].ri - nodes_index[MaxNode - 2].ri)
-        # # print(flow)
-        # Flow[index].append(flow)
-        # time_plot[index].append(t)
+        flow = -nodes_index[MaxNode - 1].di * (nodes_index[MaxNode - 1].ci - nodes_index[MaxNode - 2].ci) / (
+                nodes_index[MaxNode - 1].ri - nodes_index[MaxNode - 2].ri)
+        # print(flow)
+        Flow[index].append(flow)
+        time_plot[index].append(t)
 
         print("11. Time in thread ", index, " = ", t)
 
