@@ -30,6 +30,12 @@ if __name__ == "__main__":
         flow = -nodes[jj][MaxNode - 1].di * (nodes[jj][MaxNode - 1].ci - nodes[jj][MaxNode - 2].ci) / (nodes[jj][MaxNode - 1].ri - nodes[jj][MaxNode - 2].ri)
         Flow[jj].append(flow)
 
+    # ---------- задание графиков -------------------------
+    fig, axs = plt.subplots(2)
+    plt.subplots_adjust(wspace=0.6, hspace=0.4)
+    fig.suptitle('ГРАФИКИ')
+    # -----------------------------------
+
     t = Dt  # первый момент времени равен одному шагу по времени
     # вынесли цикл по времени над разделениями по потокам. То есть деление по потокам происходит каждый момент времени.
     while t <= time0:
@@ -41,18 +47,17 @@ if __name__ == "__main__":
         for ii in range(num_kan):
             sum_concentration += np.array(concentration[ii])
 
-        # ------ выводим график суммарной концентрации _________
-        # plt.plot(coordinate, sum_concentration, 'r', linewidth=1)
-        # plt.title("Time = " + str(t))
-        # plt.pause(0.00001)
-        # plt.clf()
-        # --------------------------------------------------------
-
-        # ---------- выводим график потока ------------------------
-        plt.plot(time_plot[0][1:], sum(np.array(Flow))[1:], 'r', linewidth=1)
-        plt.title("Time = " + str(t))
-        plt.pause(0.00001)
-        plt.clf()
         # -----------------------------------
+        axs[0].plot(coordinate, sum_concentration, 'r', linewidth=1)
+        axs[1].plot(time_plot[0][1:], sum(np.array(Flow))[1:], 'r', linewidth=1)
+        axs[0].set_title("Time = " + str(t))
+        if sum(np.array(Flow))[-1] < sum(np.array(Flow))[-2]:
+            axs[1].set_title('Поток ⟱')
+        else:
+            axs[1].set_title('Поток ⟰')
+        plt.pause(0.0001)
+        axs[0].clear()
+        axs[1].clear()
+        # ---------------------------
 
         t += Dt
