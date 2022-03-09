@@ -1,5 +1,4 @@
 import numpy as np
 
-
-x = np.zeros(2)
-print(x)
+b = [[1, 3], [4, 6]]
+print(sum(b))

@@ -30,13 +30,29 @@ if __name__ == "__main__":
         flow = -nodes[jj][MaxNode - 1].di * (nodes[jj][MaxNode - 1].ci - nodes[jj][MaxNode - 2].ci) / (nodes[jj][MaxNode - 1].ri - nodes[jj][MaxNode - 2].ri)
         Flow[jj].append(flow)
 
-    with futures.ThreadPoolExecutor(max_workers=num_kan) as executor:  # начинаем создавать потоки
+    t = Dt  # первый момент времени равен одному шагу по времени
+    # вынесли цикл по времени над разделениями по потокам. То есть деление по потокам происходит каждый момент времени.
+    while t <= time0:
+        with futures.ThreadPoolExecutor(max_workers=num_kan) as executor:  # начинаем создавать потоки
+            for jj in range(num_kan):
+                future = executor.submit(main_body_fun, D0[jj], LLL[jj], UUU[jj], kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C0[jj], nodes[jj], jj, t)  # запускаем потоки
 
-        for jj in range(num_kan):
-            future = executor.submit(main_body_fun, D0[jj], LLL[jj], UUU[jj], kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C0[jj], nodes[jj], jj)  # запускаем потоки
+        sum_concentration = np.zeros(MaxNode)  # создаем массив для суммарной концентрации
+        for ii in range(num_kan):
+            sum_concentration += np.array(concentration[ii])
 
-    sum_concentration = np.zeros(MaxNode)  # создаем массив для суммарной концентрации
-    for ii in range(num_kan):
-        sum_concentration += np.array(concentration[ii])
-    plt.plot(coordinate, sum_concentration, 'r', linewidth=1)
-    plt.show()
+        # ------ выводим график суммарной концентрации _________
+        # plt.plot(coordinate, sum_concentration, 'r', linewidth=1)
+        # plt.title("Time = " + str(t))
+        # plt.pause(0.00001)
+        # plt.clf()
+        # --------------------------------------------------------
+
+        # ---------- выводим график потока ------------------------
+        plt.plot(time_plot[0][1:], sum(np.array(Flow))[1:], 'r', linewidth=1)
+        plt.title("Time = " + str(t))
+        plt.pause(0.00001)
+        plt.clf()
+        # -----------------------------------
+
+        t += Dt
