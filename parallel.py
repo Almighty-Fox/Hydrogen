@@ -31,8 +31,8 @@ if __name__ == "__main__":
         Flow[jj].append(flow)
 
     # ---------- задание графиков -------------------------
-    fig, axs = plt.subplots(2)
-    plt.subplots_adjust(wspace=0.6, hspace=0.4)
+    fig, axs = plt.subplots(3)
+    plt.subplots_adjust(wspace=0.6, hspace=0.6)
     fig.suptitle('ГРАФИКИ')
     # -----------------------------------
 
@@ -47,17 +47,22 @@ if __name__ == "__main__":
         for ii in range(num_kan):
             sum_concentration += np.array(concentration[ii])
 
+        time_plot.append(t)
+
         # -----------------------------------
         axs[0].plot(coordinate, sum_concentration, 'r', linewidth=1)
-        axs[1].plot(time_plot[0][1:], sum(np.array(Flow))[1:], 'r', linewidth=1)
+        axs[1].plot(time_plot[1:], sum(np.array(Flow))[1:], 'r', linewidth=1)
+        axs[2].plot(coordinate, temperature[0][:], 'r', linewidth=1)
         axs[0].set_title("Time = " + str(t))
         if sum(np.array(Flow))[-1] < sum(np.array(Flow))[-2]:
             axs[1].set_title('Поток ⟱')
         else:
             axs[1].set_title('Поток ⟰')
+        axs[2].set_title('Temperature')
         plt.pause(0.0001)
         axs[0].clear()
         axs[1].clear()
+        axs[2].clear()
         # ---------------------------
 
         t += Dt

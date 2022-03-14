@@ -3,7 +3,7 @@ num_kan = 2
 concentration = [[] for i in range(num_kan)]
 temperature = [[] for i in range(num_kan)]
 Flow = [[] for i in range(num_kan)]
-time_plot = [[0] for i in range(num_kan)]
+time_plot = [0]
 
 # ---------определяем параметры для диффузии и теплопроводности----------
 D0 = [8e-6, 8e-6]  # 8e-6 m^2/s ---------- коэф диффузии

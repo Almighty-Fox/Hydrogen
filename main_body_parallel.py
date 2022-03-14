@@ -106,7 +106,6 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
             nodes_index[MaxNode - 1].ri - nodes_index[MaxNode - 2].ri)
     # print(flow)
     Flow[index].append(flow)
-    time_plot[index].append(t)
 
     # if t > Dt:
     #     if (Flow[-2] > Flow[-1]) and (Flow[-2] > Flow[-3]):

@@ -101,6 +101,7 @@ if __name__ == "__main__":
             grafik_average_2(x_inter[ii], y_inter[ii])
             # plt.figure(ii+10)
             # grafik_average_2(x_inter[ii], y_inter[ii])
+            # plt.title(sample[ii])
 
         plt.show()
 
