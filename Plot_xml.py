@@ -90,8 +90,8 @@ if __name__ == "__main__":
             x_inter.append(range(len(x[division_points[ii][0]:division_points[ii][1]])))  # сдвигаем по иксу на 0
             y_inter.append(y[division_points[ii][0]:division_points[ii][1]])
 
-        for ii in range(len(division_points)):
-        # for ii in range(1):
+        # for ii in range(len(division_points)):
+        for ii in range(1):
             plt.figure(ii+1)
             grafik(x_inter[ii], y_inter[ii])  # строим исходный график
             plt.title(sample[ii])

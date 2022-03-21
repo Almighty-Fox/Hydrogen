@@ -40,8 +40,8 @@ class ClassOFNodes:
 
     def determination_di(self, do, UUU, kkk):
         """определяем коэф диффузии в каждом узле"""
-        # self.di = do * math.exp((-UUU / (kkk * self.ti)))
-        self.di = 1e-9  # m^2/s
+        self.di = do * math.exp((-UUU / (kkk * self.ti)))
+        # self.di = 1e-9  # m^2/s
 
     def determination_cl(self, CLL):
         """sffeferfeferfe"""

@@ -1,38 +1,24 @@
 from math import *
-from matplotlib import pyplot as plt
-from nodes_class import ClassOFNodes
 from progonka import neyavnaya_progonka
 from progonka_tempr import neyavnaya_progonka_tempr
-from eq_for_lovushek import function_for_lovushek
-from scipy.optimize import fsolve
-import numpy
 from global_var import *
+import numpy as np
 
 
 def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C0, nodes_index, index, t):
     global concentration, Flow, time_plot, temperature
     # plt.style.use('seaborn-pastel')
 
-    # ----------------------------------
-    # fig, axs = plt.subplots(3)
-    # # fig_2, axs_2 = plt.subplots(3)
-    # plt.subplots_adjust(wspace=0.6, hspace=0.9)
-    # fig.suptitle('ГРАФИКИ')
-    # axs[0].plot(coordinate, concentration, 'r', linewidth=1)
-    # axs[1].plot(time_plot, Flow, 'g', linewidth=1)
-    # axs[2].plot(coordinate, temperature, 'b', linewidth=1)
-    # axs[0].set_title('Дисперсионная кривая')
-    # axs[1].set_title('Поток')
-    # axs[2].set_title('Температура')
-    # plt.pause(2)
-    # axs[0].clear()
-    # axs[1].clear()
-    # axs[2].clear()
-    # # plt.clf()
-    # -----------------------------------
-
-    # TTT = To + vel * t  # опрелеяем температуру воздуха в данный момент времени
-    TTT = 750 + 273
+    vel = (530 - 20) / 10 / 60
+    '''
+    if t < 10 * 60:
+        # TTT = To + vel * t  # опрелеяем температуру воздуха в данный момент времени
+        TTT = To + (530 - 20)/sqrt(10 * 60) * sqrt(t)
+    else:
+        TTT = 530 + 273
+    # TTT = 530 + 273
+    '''
+    TTT = To + ((530 - 20) / np.pi * 2) * np.arctan(t/70)
 
     # --------------решаем уравнение теплопроводности------------
     for node in nodes_index:
@@ -61,15 +47,16 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
 
     # раньше так определяли коэф диффузии, он зависил только от температуры
     # (и постоянных: коэф диф, эн связи, коэф Больцмана)
-
-    # for node in nodes:
-    #     node.determination_di(D0, UUU, kkk)  # определяем коэф диффузии в данный момент времени в данном узле
-
+    # '''
+    for node in nodes_index:
+        node.determination_di(D0, UUU, kkk)  # определяем коэф диффузии в данный момент времени в данном узле
+    '''
     # теперь считаем коэф диффузии с учетом ловушек
     for node in nodes_index:
         CL_ = fsolve(function_for_lovushek, numpy.array([0.2]), args=(VL, VT1, K1, node.ci))
         node.determination_cl(CL_[0])
         node.determination_di_lovushki(D0, UUU, kkk, VL, VT1, K1, DT1)
+    '''
 
     # --------------решаем уравнение диффузии------------
     for node in nodes_index:
@@ -104,6 +91,7 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
 
     flow = -nodes_index[MaxNode - 1].di * (nodes_index[MaxNode - 1].ci - nodes_index[MaxNode - 2].ci) / (
             nodes_index[MaxNode - 1].ri - nodes_index[MaxNode - 2].ri)
+
     # print(flow)
     Flow[index].append(flow)
 

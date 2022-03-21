@@ -3,21 +3,20 @@ from main_body_parallel import *
 import numpy as np
 from nodes_class import ClassOFNodes
 from global_var import *
+from matplotlib import pyplot as plt
 
 
 if __name__ == "__main__":
-    global concentration, Flow, time_plot, temperature
+    global concentration, Flow, time_plot, temperature, Time_pik_1, Flow_pik_1
 
     nodes = [[ClassOFNodes(i, Rad, MaxNode) for i in range(MaxNode)] for jj in range(num_kan)]  # вводим массив объектов класса узлов
 
     for jj in range(num_kan):
         for node in nodes[jj]:  # назначаем начальную концентрацию, коэффициент диффузии и Т
+                                # заоплняем начальные массивы концентрации, температуры
             node.determination_co(Rl, width_l, C1[jj], C2[jj], width_r)
             node.determination_ti(To)
             node.determination_di(D0[jj], UUU[jj], kkk)
-
-    for jj in range(num_kan):
-        for node in nodes[jj]:  # заоплняем начальные массивы концентрации, температуры
             concentration[jj].append(node.ci)
             temperature[jj].append(node.ti)
 
@@ -48,16 +47,21 @@ if __name__ == "__main__":
             sum_concentration += np.array(concentration[ii])
 
         time_plot.append(t)
-
+        # -----------------------------------
+        if t > Dt:
+            if (sum(np.array(Flow))[-2] > sum(np.array(Flow))[-1]) and (sum(np.array(Flow))[-2] > sum(np.array(Flow))[-3]):
+                Time_pik_1 = t - Dt
+                Flow_pik_1 = sum(np.array(Flow))[-2]
         # -----------------------------------
         axs[0].plot(coordinate, sum_concentration, 'r', linewidth=1)
-        axs[1].plot(time_plot[1:], sum(np.array(Flow))[1:], 'r', linewidth=1)
-        axs[2].plot(coordinate, temperature[0][:], 'r', linewidth=1)
-        axs[0].set_title("Time = " + str(t))
+        axs[1].plot(time_plot[0:], sum(np.array(Flow))[0:], 'b', linewidth=1)
+        axs[2].plot(coordinate, temperature[0][:], 'g', linewidth=1)
+        # axs[0].set_title("Time = " + str(t))
+        axs[0].set_title("Time = {0} c = {1:.2f} мин".format(t, t/60))
         if sum(np.array(Flow))[-1] < sum(np.array(Flow))[-2]:
-            axs[1].set_title('Поток ⟱')
+            axs[1].set_title('Поток ⟱ ' + "Время пика {0:.2f}".format(Time_pik_1))
         else:
-            axs[1].set_title('Поток ⟰')
+            axs[1].set_title('Поток ⟰ ' + "Время пика {0:.2f}".format(Time_pik_1))
         axs[2].set_title('Temperature')
         plt.pause(0.0001)
         axs[0].clear()
@@ -66,3 +70,5 @@ if __name__ == "__main__":
         # ---------------------------
 
         t += Dt
+
+    out = input()
