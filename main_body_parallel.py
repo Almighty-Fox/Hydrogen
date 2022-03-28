@@ -1,4 +1,8 @@
 from math import *
+
+from scipy.optimize import fsolve
+
+from eq_for_lovushek import function_for_lovushek
 from progonka import neyavnaya_progonka
 from progonka_tempr import neyavnaya_progonka_tempr
 from global_var import *
@@ -10,7 +14,7 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
     # plt.style.use('seaborn-pastel')
 
     vel = (530 - 20) / 10 / 60
-    '''
+    ''' линейный закон до некоторого временеи, дальше константа
     if t < 10 * 60:
         # TTT = To + vel * t  # опрелеяем температуру воздуха в данный момент времени
         TTT = To + (530 - 20)/sqrt(10 * 60) * sqrt(t)
@@ -18,8 +22,8 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
         TTT = 530 + 273
     # TTT = 530 + 273
     '''
-    TTT = To + ((530 - 20) / np.pi * 2) * np.arctan(t/70)
-
+    TTT = To + ((530 - 20) / np.pi * 2) * np.arctan(t/15)  # функция арктангенса
+    # TTT = To_end / (1 + exp(-t + np.log((To_end - To) / To)))  # сигмоида
     # --------------решаем уравнение теплопроводности------------
     for node in nodes_index:
         node.determination_abcf_zero()  # обнуляем коэффициенты
@@ -53,10 +57,10 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
     '''
     # теперь считаем коэф диффузии с учетом ловушек
     for node in nodes_index:
-        CL_ = fsolve(function_for_lovushek, numpy.array([0.2]), args=(VL, VT1, K1, node.ci))
+        CL_ = fsolve(function_for_lovushek, np.array([0.2]), args=(VL, VT1, K1, node.ci))
         node.determination_cl(CL_[0])
         node.determination_di_lovushki(D0, UUU, kkk, VL, VT1, K1, DT1)
-    '''
+    # '''
 
     # --------------решаем уравнение диффузии------------
     for node in nodes_index:
