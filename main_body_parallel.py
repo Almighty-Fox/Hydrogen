@@ -22,7 +22,7 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
         TTT = 530 + 273
     # TTT = 530 + 273
     '''
-    TTT = To + ((530 - 20) / np.pi * 2) * np.arctan(t/15)  # функция арктангенса
+    TTT = To + ((530 - 20) / np.pi * 2) * np.arctan(t/40)  # функция арктангенса
     # TTT = To_end / (1 + exp(-t + np.log((To_end - To) / To)))  # сигмоида
     # --------------решаем уравнение теплопроводности------------
     for node in nodes_index:
@@ -81,10 +81,10 @@ def main_body_fun(D0, LLL, UUU, kkk, To, VL, VT1, K1, DT1, MaxNode, Dt, time0, C
 
     nodes_index[MaxNode - 1].determination_abcf_gu(C0)  # определяем ГУ для коэф a,b,c,d
 
-
-    # ------------------прогонка неявного метода---------------------------------
-    nodes_index = neyavnaya_progonka(nodes_index, MaxNode)
-    # ------------------конец прогонки---------------------------------
+    if TTT >= T_ac[index]:
+        # ------------------прогонка неявного метода---------------------------------
+        nodes_index = neyavnaya_progonka(nodes_index, MaxNode)
+        # ------------------конец прогонки---------------------------------
     # -----------конец решения уравнения диффузии-----------------------
     # нашли концентрацию во всех узлах в следующий момент времени
     concentration[index] = []

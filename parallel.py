@@ -71,7 +71,7 @@ if __name__ == "__main__":
             axs[1].set_title('Поток ⟱ ' + "Время пика {0:.2f}, поток {1:0.4g}".format(Time_pik_1, Flow_pik_1))
         else:
             axs[1].set_title('Поток ⟰ ' + "Время пика {0:.2f}, поток {1:0.4g}".format(Time_pik_1, Flow_pik_1))
-        axs[2].set_title('Temperature')
+        axs[2].set_title('Temperature {0:.2f}'.format(temperature[0][-1]))
 
         axs[0].legend(["Sum", "1", "2", "3", "4"])
         axs[1].legend(["Sum", "1", "2", "3", "4"])
