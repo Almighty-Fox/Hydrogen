@@ -1,5 +1,8 @@
 from matplotlib import pyplot as plt
 import xml.etree.ElementTree as ET  # для чтения файлов xml
+import numpy as np
+import pandas as pd
+import seaborn as sns
 
 
 def def_read_xml(name_xml):  # функция чтения значений из xml
@@ -76,7 +79,61 @@ def grafik_average_2(x, y):  # осредняем каждые 100 точек
 
 if __name__ == "__main__":
 
-    name_file = r'F:\Evgenii\Hydrogen_\Hydrogen\Xml_files\New_for_NN\Д16-4мм.xml'
+    name_file = r'F:\Evgenii\Hydrogen_\ДЕванатан_x70\деванотан_часть1_№6_исх.xml'
+
+    [x, y] = def_read_xml(name_file)  # заполняем массивы для графика
+    [x, y] = change_point(x, y)  # меняем запятые на точки
+
+    plt.figure(1)
+    grafik(x, y)  # строим исходный график
+    # plt.title(sample[ii])
+    plt.title("Экспериментальная десорбционная кривая")
+    plt.xlabel("Time")
+    plt.ylabel("Flow")
+    plt.grid()
+    # ----- строим коридоры -------
+    num_ex = 7
+    for i in np.linspace(min(x), max(x), num_ex):
+        plt.plot([i, i], [min(y), max(y)], '--k', linewidth=1)
+    # -----------------------------
+    # plt.show()
+
+    # -------------- выделяем один пик --------
+    xx_begin = 6.32e3
+    xx_end = 7.15e3
+    id_begin = 0
+    id_end = max(x)
+    for ID, i in enumerate(x):
+        if i > xx_begin:
+            id_begin = ID
+            break
+    for ID, i in enumerate(x[id_begin:]):
+        if i > xx_end:
+            id_end = ID + id_begin
+            break
+    print("ID begin = {}".format(id_begin))
+    print("ID end = {}".format(id_end))
+    df = pd.DataFrame(dict(x=x[id_begin:id_end], y=y[id_begin:id_end]))
+    # -----------------------------------------
+    # ------ рисуем выделенный пик -------
+    plt.figure()
+    sns.lineplot(x=df.x, y=df.y)
+    plt.title("Экспериментальная десорбционная кривая")
+    plt.xlabel("Time")
+    plt.ylabel("Flow")
+    plt.grid()
+    # ------ рисуем сглаженный выделенный пик -------
+    plt.figure()
+    df2 = df.rolling(window=10).mean()
+    sns.lineplot(x=df2.x, y=df2.y)
+    plt.title("Экспериментальная десорбционная кривая")
+    plt.xlabel("Time")
+    plt.ylabel("Flow")
+    plt.grid()
+
+    plt.show()
+
+    """
     division_points = [[3967, 6547], [7299, 9877], [10292, 12365], [13148, 14995], [15447, 18678]]
     sample = ["7 мм", "6 мм", "5 мм", "4 мм", "8 мм"]
 
@@ -111,3 +168,5 @@ if __name__ == "__main__":
 
     except:
         print('все плохо, не могу открыть ', name_file)
+        
+    """""
